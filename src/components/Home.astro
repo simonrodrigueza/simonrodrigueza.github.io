@@ -1,0 +1,151 @@
+---
+import fs from 'node:fs';
+import Base from '../layouts/Base.astro';
+import { profile, ui, type Lang } from '../data/site';
+import { visuals } from '../data/visuals';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = ui[lang];
+
+// Lee los archivos Markdown de src/content/<idioma>/ en orden alfabético
+const modules = import.meta.glob<any>('../content/*/*.md', { eager: true });
+const sections = Object.entries(modules)
+  .filter(([path]) => path.includes(`/content/${lang}/`))
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, mod], i) => {
+    const fm = mod.frontmatter;
+    const v = visuals.find((x) => x.id === fm.id) ?? visuals[i % visuals.length];
+    return { ...fm, Content: mod.Content, v };
+  });
+
+const hasCV = fs.existsSync('public/cv.pdf');
+const first = sections[0].v;
+const hex = (n: number) => Math.round(n).toString(16).padStart(2, '0');
+const mix = (a: string, b: string, f: number) => {
+  const x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16);
+  const ch = (n: number, s: number) => (n >> s) & 255;
+  return '#' + [16, 8, 0].map((s) => hex(ch(x, s) + (ch(y, s) - ch(x, s)) * f)).join('');
+};
+const altHref = lang === 'en' ? '/es/' : '/';
+const title = `${profile.name} — ${lang === 'en' ? 'Astronomy' : 'Astronomía'}`;
+---
+
+<Base lang={lang} title={title} description={t.description}>
+  <div
+    id="top"
+    class="page"
+    data-page
+    data-lang={lang}
+    data-visuals={JSON.stringify(visuals)}
+    style={`--accent:${first.color};--ground:${mix('#0B0C10', first.color, 0.07)}`}
+  >
+    <h1 class="sr">{profile.name}</h1>
+
+    <header class="top" data-header>
+      <a class="mark" href="#top">{profile.name.toUpperCase().replace('SIMÓN ', 'S. ')}</a>
+      <nav class="navwrap" aria-label={t.sectionsLabel}>
+        {sections.map((s, i) => (
+          <a class="toc" href={`#${s.id}`} data-target={s.id} aria-current={i === 0 ? 'true' : undefined}>
+            <span class="roman">{s.v.roman}</span>
+            <span>{s.label}</span>
+          </a>
+        ))}
+      </nav>
+      <div class="tools">
+        <button type="button" class="anim-switch" role="switch" aria-checked="true" data-anim-switch>
+          <span class="animword">{t.animation}</span>
+          <span class="track" aria-hidden="true"><span class="knob"></span></span>
+          <span class="state" data-anim-state>ON</span>
+        </button>
+        <a class="langbtn" href={altHref} hreflang={lang === 'en' ? 'es' : 'en'} aria-label={t.switchLabel} data-lang-switch>
+          {lang === 'en' ? 'EN / es' : 'ES / en'}
+        </a>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="stick" aria-label={t.figureAlt}>
+        <div class="det">
+          <canvas data-detector data-name={JSON.stringify(profile.nameLines)} role="img" aria-label={t.figureAlt}></canvas>
+        </div>
+        <p class="caption"><em data-plate-caption>{`${t.plate} ${first.roman}.`}</em> <span data-plate-text>{first.plate[lang]}</span></p>
+      </aside>
+
+      <main class="col">
+        {sections.map((s, i) => (
+          <section id={s.id} class:list={['sec', { 'is-active': i === 0 }]} data-section={s.id} style={`--c:${s.v.color};--rn:'${s.v.roman}'`}>
+            {i === 0 && (
+              <div class="intro-block">
+                <p class="intro">{t.intro}</p>
+                <div class="cta">
+                  {hasCV && <a href="/cv.pdf" download="Simon-Rodriguez-Arango-CV.pdf">{t.cv} ↓</a>}
+                  {profile.email && <a href={`mailto:${profile.email}`}>{t.email}</a>}
+                  {profile.github && <a href={profile.github}>GitHub</a>}
+                  {profile.orcid && <a href={profile.orcid}>ORCID</a>}
+                </div>
+              </div>
+            )}
+            <div class="panel-head">
+              <span class="roman-big">{s.v.roman}</span>
+              <h2>{s.title}</h2>
+            </div>
+            <div class="body"><s.Content /></div>
+            {s.facts?.length > 0 && (
+              <dl class="facts">
+                {s.facts.map((f: { k: string; v: string }) => (
+                  <div class="fact">
+                    <dt>{f.k}</dt>
+                    <span class="leader" aria-hidden="true"></span>
+                    <dd>{f.v}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            {s.id === 'cv' && hasCV && (
+              <div class="cv-viewer">
+                <div class="frame cv-frame">
+                  <span class="crop tl"></span><span class="crop br"></span>
+                  <iframe src="/cv.pdf#toolbar=0&navpanes=0&view=FitH" title={t.cvTitle} loading="lazy"></iframe>
+                </div>
+                <p class="cv-actions">
+                  <a href="/cv.pdf" target="_blank" rel="noopener">{t.openPdf}</a>
+                  <a href="/cv.pdf" download="Simon-Rodriguez-Arango-CV.pdf">{t.downloadPdf}</a>
+                </p>
+              </div>
+            )}
+            {s.figure && !(s.id === 'cv' && hasCV) && (
+              <figure class="plate-fig">
+                <div class="frame" style={`aspect-ratio:${s.figure.ratio ?? '4 / 3'}`}>
+                  <span class="crop tl"></span><span class="crop br"></span>
+                  {s.figure.src ? (
+                    <img src={s.figure.src} alt={s.figure.alt ?? ''} loading="lazy" decoding="async" />
+                  ) : (
+                    <span class="slot">{s.figure.placeholder}</span>
+                  )}
+                </div>
+                <figcaption><em>{t.fig} {i + 1} —</em> {s.figure.caption}</figcaption>
+              </figure>
+            )}
+          </section>
+        ))}
+
+        <footer class="foot">
+          <span>© {new Date().getFullYear()} SIMONRODRIGUEZA.GITHUB.IO</span>
+          <span class="foot-links">
+            {profile.orcid && <a href={profile.orcid}>ORCID</a>}
+            {profile.github && <a href={profile.github}>GITHUB</a>}
+            {profile.ads && <a href={profile.ads}>ADS</a>}
+            {profile.linkedin && <a href={profile.linkedin}>LINKEDIN</a>}
+            {profile.email && <a href={`mailto:${profile.email}`}>EMAIL</a>}
+          </span>
+        </footer>
+        <div class="endpad" aria-hidden="true"></div>
+      </main>
+    </div>
+  </div>
+</Base>
+
+<script>
+  import '../scripts/app.js';
+</script>

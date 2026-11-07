@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  lang: 'en' | 'es';
+  title: string;
+  description: string;
+}
+const { lang, title, description } = Astro.props;
+const site = Astro.site ?? new URL('https://simonrodrigueza.github.io');
+const enUrl = new URL('/', site).href;
+const esUrl = new URL('/es/', site).href;
+const canonical = lang === 'en' ? enUrl : esUrl;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="es" href={esUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="theme-color" content="#0B0C10" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600&family=Martian+Mono:wght@300;400;500&display=swap"
+    />
+    <script is:inline>
+      (function () {
+        var h = document.documentElement, pref = null;
+        h.classList.add('js');
+        try { pref = localStorage.getItem('sra-anim'); } catch (e) {}
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var on = pref ? pref === 'on' : !reduce;
+        h.classList.add(on ? 'anim-on' : 'anim-off');
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
