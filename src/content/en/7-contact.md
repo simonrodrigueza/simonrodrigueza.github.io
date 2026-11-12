@@ -10,4 +10,4 @@ open:
 based: Medellín, Colombia (UTC−5)
 ---
 
-I am always happy to talk about astrophysics, from protoplanetary disks and astrochemistry to stars, galaxies and the data and tools we use to study them. If you have an idea for a collaboration, a PhD opening, or a question about my work, write to me.
+I am always happy to talk about astrophysics, from protoplanetary disks and astrochemistry to stars and galaxies. If you have an idea for a collaboration, a PhD opening, or a question about my work, write to me.

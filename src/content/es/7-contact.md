@@ -10,4 +10,4 @@ open:
 based: Medellín, Colombia (UTC−5)
 ---
 
-Siempre me gusta hablar de astrofísica, desde discos protoplanetarios y astroquímica hasta estrellas, galaxias y los datos y herramientas con los que las estudiamos. Si tienes una idea para colaborar, una vacante de doctorado o una pregunta sobre mi trabajo, escríbeme.
+Siempre me gusta hablar de astrofísica, desde discos protoplanetarios y astroquímica hasta estrellas y galaxias. Si tienes una idea para colaborar, una vacante de doctorado o una pregunta sobre mi trabajo, escríbeme.

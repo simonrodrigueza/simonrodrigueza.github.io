@@ -4,7 +4,7 @@ label: Publicaciones
 title: Publicaciones y charlas
 ---
 
-### Artículos
+### Artículos en coautoría
 
 - **XUE. ProDiMo models of internally and externally irradiated planet-forming disks around 0.3–4.0 M☉ stars (The IRIS project I)**\
   Frediani, J., Getman, K. V., Woitke, P., et al., incluyendo a **Rodríguez, S.** (autor 14 de 21)\
