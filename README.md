@@ -69,7 +69,7 @@ Cada línea que empieza con `###` crea un subtítulo numerado (II.1, II.2…)
 que toma el color de la etapa. Úsalos para ir agregando proyectos o temas.
 ```
 
-- **Tu foto**: guárdala en `public/images/` (por ejemplo `foto.jpg`) y en `src/content/en/1-about.md` y `src/content/es/1-about.md` pon `src: /images/foto.jpg`.
+- **Tu foto**: guárdala en `public/images/` (por ejemplo `foto.jpg`, cuadrada) y en `src/data/site.ts` pon `photo: '/images/foto.jpg'`. Ahí mismo están el correo, ORCID, LinkedIn y GitHub de los botones del encabezado.
 - **Tu CV**: guarda el PDF como `public/cv.pdf`. El botón de descarga aparece solo.
 - Cualquier campo que dejes vacío (`''`) en `site.ts` simplemente no se muestra.
 

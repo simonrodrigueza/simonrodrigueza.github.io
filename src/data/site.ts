@@ -8,11 +8,13 @@ export const profile = {
   name: 'Simón Rodríguez Arango',
   // Dos líneas del nombre tal como aparecen dentro del detector
   nameLines: ['Simón', 'Rodríguez Arango'],
+  // Foto del encabezado: pon el archivo en public/images/ y escribe aquí su ruta, ej. '/images/foto.jpg'
+  photo: '',
   email: 'simon.rodrigueza@udea.edu.co',
   github: 'https://github.com/simonrodrigueza',
-  orcid: '', // ej. 'https://orcid.org/0000-0000-0000-0000'
+  orcid: 'https://orcid.org/0009-0005-7958-3759',
+  linkedin: 'https://www.linkedin.com/in/simonrodrigueza23/',
   ads: '', // enlace a tu biblioteca pública de ADS
-  linkedin: '',
 };
 
 // Textos que dependen del idioma
@@ -21,7 +23,11 @@ export const ui = {
     htmlLang: 'en',
     description:
       'Simón Rodríguez Arango — astronomy undergraduate at Universidad de Antioquia working on the chemistry of protoplanetary disks with JWST.',
-    intro: 'Astronomy undergraduate at Universidad de Antioquia, working on disk chemistry with JWST. Looking for a PhD position starting in 2027.',
+    role: 'Astronomy undergraduate, Universidad de Antioquia',
+    topics: 'Protoplanetary disks, astrochemistry and extreme UV environments, with JWST. Looking for a PhD position starting in 2027.',
+    photoAlt: 'Portrait of Simón Rodríguez Arango',
+    photoPlaceholder: '[photo]',
+    downloadCv: 'Download CV',
     cv: 'CV (PDF)',
     cvTitle: 'Curriculum vitae (PDF)',
     openPdf: 'Open in a new tab ↗',
@@ -42,7 +48,11 @@ export const ui = {
     htmlLang: 'es',
     description:
       'Simón Rodríguez Arango — estudiante de Astronomía en la Universidad de Antioquia; química de discos protoplanetarios con JWST.',
-    intro: 'Estudiante de Astronomía en la Universidad de Antioquia; trabajo en química de discos con JWST. Busco un doctorado que empiece en 2027.',
+    role: 'Estudiante de Astronomía, Universidad de Antioquia',
+    topics: 'Discos protoplanetarios, astroquímica y ambientes UV extremos, con JWST. Busco un doctorado que empiece en 2027.',
+    photoAlt: 'Retrato de Simón Rodríguez Arango',
+    photoPlaceholder: '[foto]',
+    downloadCv: 'Descargar CV',
     cv: 'CV (PDF)',
     cvTitle: 'Hoja de vida (PDF)',
     openPdf: 'Abrir en otra pestaña ↗',
