@@ -15,6 +15,9 @@ export const profile = {
   orcid: 'https://orcid.org/0009-0005-7958-3759',
   linkedin: 'https://www.linkedin.com/in/simonrodrigueza23/',
   ads: '', // enlace a tu biblioteca pública de ADS
+  // Estadísticas de visitas (GoatCounter): escribe aquí el código de tu cuenta, ej. 'simonrodrigueza'.
+  // Vacío = sin estadísticas.
+  goatcounter: 'simonrodrigueza',
 };
 
 // Textos que dependen del idioma

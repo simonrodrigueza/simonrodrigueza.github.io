@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { profile } from '../data/site';
 
 interface Props {
   lang: 'en' | 'es';
@@ -46,6 +47,9 @@ const canonical = lang === 'en' ? enUrl : esUrl;
         h.classList.add(on ? 'anim-on' : 'anim-off');
       })();
     </script>
+    {profile.goatcounter && (
+      <script is:inline data-goatcounter={`https://${profile.goatcounter}.goatcounter.com/count`} async src="//gc.zgo.at/count.js"></script>
+    )}
   </head>
   <body>
     <slot />
