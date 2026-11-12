@@ -24,6 +24,19 @@ function lut(stops) {
   return out;
 }
 
+// Campo de estrellas para la última etapa: posiciones fijas (semilla) y brillos con ley de potencias
+function buildField(n) {
+  let seed = 29;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const x = 0.06 + 0.86 * rnd(), y = 0.1 + 0.8 * rnd();
+    if (Math.abs(x - 0.52) < 0.09 && Math.abs(y - 0.46) < 0.09) continue; // deja libre el sistema central
+    out.push({ x, y, b: 0.25 + 1.6 * Math.pow(rnd(), 6) });
+  }
+  return out;
+}
+
 function buildParticles(n) {
   let seed = 11;
   const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
@@ -56,6 +69,8 @@ export class Detector {
     this.nameExp = 0;
     this.ray = null;
     this.planets = [{ r: 4.8, th: 0.6 }, { r: 7.05, th: 3.4 }];
+    this.field = buildField(90);
+    this.target = { x: 0.7, y: 0.25 }; // estrella marcada como el próximo objetivo
     this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const small = window.innerWidth < 760 && (navigator.hardwareConcurrency || 8) <= 4;
     this.parts = buildParticles(small ? 2400 : window.innerWidth < 760 ? 3000 : 4200);
@@ -272,6 +287,7 @@ export class Detector {
     const gapG = sm(1.0, 2.6, S), planetsP = sm(2.1, 3.5, S), trunc = sm(3.2, 4.8, S), dissip = sm(4.1, 5.0, S);
     const wind = sm(3.1, 4.3, S) * (1 - 0.8 * sm(4.4, 5.0, S));
     const star = sm(0.5, 1.3, S) + 0.9 * Math.exp(-Math.pow((S - 1.05) / 0.18, 2));
+    const far = st.length > 6 ? sm(5.0, 5.9, S) : 0; // etapa VII: nos alejamos y aparece el campo de estrellas
 
     const buf = this.buf, N = gw * gh;
     for (let k = 0; k < N; k++) buf[k] = buf[k] * decay + Math.random() * noise;
@@ -300,7 +316,7 @@ export class Detector {
         const off = (time * 0.12 + p.ph) % 1, push = wind * Math.pow((p.r - 6.5) / 4, 1.2) * off;
         X -= push * s * 9; Y += push * s * 1.3 * (y > 0 ? 1 : -1); w *= 1 - off * 0.8;
       } else if (p.r > rcut) w *= 0.15;
-      w *= 1 - 0.88 * dissip;
+      w *= (1 - 0.88 * dissip) * (1 - 0.97 * far);
       add(X, Y, w);
     }
 
@@ -308,13 +324,14 @@ export class Detector {
       for (const pl of this.planets) {
         pl.th += 0.55 * Math.pow(pl.r, -1.5) * spin;
         const PX = cx + s * pl.r * Math.cos(pl.th), PY = cy + s * pl.r * Math.sin(pl.th) * ci;
-        for (let py = -3; py <= 3; py++) for (let px = -3; px <= 3; px++) add(PX + px, PY + py, 2.4 * planetsP * Math.exp(-(px * px + py * py) / 1.6));
+        const pw = 2.4 * planetsP * (1 - 0.35 * far), pr = 1.6 * (1 - 0.6 * far);
+        for (let py = -3; py <= 3; py++) for (let px = -3; px <= 3; px++) add(PX + px, PY + py, pw * Math.exp(-(px * px + py * py) / pr));
       }
     }
     if (star > 0.01) {
       const core = Math.max(1.5, s * 0.05);
       for (let dy = -6; dy <= 6; dy++) for (let dx = -6; dx <= 6; dx++) add(cx + dx, cy + dy, 3 * star * Math.exp(-(dx * dx + dy * dy) / (2 * core * core)));
-      const spikeLen = narrow ? 34 : 56;
+      const spikeLen = (narrow ? 34 : 56) * (1 - 0.45 * far);
       for (let a6 = 0; a6 < 6; a6++) {
         const ang = (a6 * Math.PI) / 3 + Math.PI / 2, cg = Math.cos(ang), sg = Math.sin(ang);
         for (let r2 = 2; r2 < spikeLen; r2++) add(cx + cg * r2, cy + sg * r2, (0.9 * Math.min(star, 1.6)) / (1 + r2 * 0.12));
@@ -324,6 +341,17 @@ export class Detector {
       const ox = gw * 0.88, oy = gh * 0.14;
       for (let dy = -5; dy <= 5; dy++) for (let dx = -5; dx <= 5; dx++) add(ox + dx, oy + dy, 3 * wind * Math.exp(-(dx * dx + dy * dy) / 4));
       for (let a2 = 0; a2 < 6; a2++) { const an = (a2 * Math.PI) / 3 + Math.PI / 2; for (let r4 = 2; r4 < 30; r4++) add(ox + Math.cos(an) * r4, oy + Math.sin(an) * r4, (wind * 0.8) / (1 + r4 * 0.15)); }
+    }
+    if (far > 0.01) {
+      const psf = (x0, y0, b, spikes) => {
+        for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) add(x0 + dx, y0 + dy, b * Math.exp(-(dx * dx + dy * dy) / 1.1));
+        if (spikes) for (let a7 = 0; a7 < 6; a7++) {
+          const an = (a7 * Math.PI) / 3 + Math.PI / 2;
+          for (let r7 = 2; r7 < spikes; r7++) add(x0 + Math.cos(an) * r7, y0 + Math.sin(an) * r7, (b * 0.18) / (1 + r7 * 0.35));
+        }
+      };
+      for (const fs of this.field) psf(fs.x * gw, fs.y * gh, 0.32 * fs.b * far, fs.b > 1.3 ? (narrow ? 6 : 9) : 0);
+      psf(this.target.x * gw, this.target.y * gh, 1.8 * far, narrow ? 10 : 15);
     }
     if (!this.reduced) {
       if (!this.ray && Math.random() < dt * (0.2 + 0.8 * e)) this.ray = { x: Math.random() * gw, y: Math.random() * gh * 0.6, a: Math.random() * Math.PI, len: 3 + Math.random() * 6, life: 1 };
@@ -416,6 +444,40 @@ export class Detector {
     const cm = (x0, y0, dx, dy) => { ctx.beginPath(); ctx.moveTo(x0 + dx * 18, y0); ctx.lineTo(x0, y0); ctx.lineTo(x0, y0 + dy * 18); ctx.stroke(); };
     const g = 5;
     cm(m - g + 0.5, m - g + 0.5, 1, 1); cm(W - m + g - 0.5, m - g + 0.5, -1, 1); cm(m - g + 0.5, H - m + g - 0.5, 1, -1); cm(W - m + g - 0.5, H - m + g - 0.5, -1, -1);
+
+    // Etapa VII: órbitas de los planetas y retícula sobre el próximo objetivo
+    if (far > 0.01) {
+      ctx.save();
+      ctx.globalAlpha = far;
+      ctx.strokeStyle = acc(0.45); ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
+      for (const pl of this.planets) {
+        ctx.beginPath();
+        ctx.ellipse(cx * pix, cy * pix, s * pl.r * pix, s * pl.r * pix * ci, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      const tx2 = (Math.floor(this.target.x * gw) + 0.5) * pix, ty2 = (Math.floor(this.target.y * gh) + 0.5) * pix;
+      const pulse = this.reduced ? 0 : Math.sin(time * 2.2) * 2;
+      const rr = (narrow ? 16 : 24) + pulse, arm = narrow ? 6 : 9;
+      ctx.strokeStyle = acc(0.95); ctx.lineWidth = 1.5;
+      for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+        ctx.beginPath();
+        ctx.moveTo(tx2 + sx * rr, ty2 + sy * (rr - arm)); ctx.lineTo(tx2 + sx * rr, ty2 + sy * rr); ctx.lineTo(tx2 + sx * (rr - arm), ty2 + sy * rr);
+        ctx.stroke();
+      }
+      ctx.font = `500 ${narrow ? 9 : 10}px 'Martian Mono', monospace`;
+      ctx.textAlign = 'right';
+      // En celular solo va el rótulo, al lado de la retícula; en computador, debajo y con coordenadas
+      const l1 = this.lang === 'es' ? 'PRÓXIMO OBJETIVO' : 'NEXT TARGET', l2 = 'RA 05 35 16.5  DEC −05 23 23';
+      const lx = tx2 - rr - 10, ly = narrow ? ty2 + 4 : ty2 + rr + 16;
+      const bw2 = (narrow ? ctx.measureText(l1).width : Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width)) + 12;
+      ctx.fillStyle = 'rgba(11,12,16,0.6)';
+      ctx.fillRect(lx - bw2 + 6, ly - 13, bw2, narrow ? 18 : 34);
+      ctx.fillStyle = acc(1); ctx.fillText(l1, lx, ly);
+      if (!narrow) { ctx.fillStyle = 'rgba(236,232,223,0.8)'; ctx.fillText(l2, lx, ly + 15); }
+      ctx.restore();
+      ctx.textAlign = 'left';
+    }
 
     this.drawName(ctx, L, time, acc);
   }

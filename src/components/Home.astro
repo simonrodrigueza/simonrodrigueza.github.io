@@ -27,6 +27,9 @@ const mix = (a: string, b: string, f: number) => {
   const ch = (n: number, s: number) => (n >> s) & 255;
   return '#' + [16, 8, 0].map((s) => hex(ch(x, s) + (ch(y, s) - ch(x, s)) * f)).join('');
 };
+// Fecha de la última compilación (se actualiza sola con cada push)
+const built = new Date();
+const updated = built.toLocaleDateString(lang === 'es' ? 'es-CO' : 'en-GB', { month: 'long', year: 'numeric', timeZone: 'America/Bogota' });
 const altHref = lang === 'en' ? '/es/' : '/';
 const title = `${profile.name} — ${lang === 'en' ? 'Astronomy' : 'Astronomía'}`;
 // Íconos de los botones (SVG en línea, toman el color del texto)
@@ -35,6 +38,7 @@ const icons = {
   mail: '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="1.8" y="3.3" width="12.4" height="9.4" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m2.3 4 5.7 4.6L13.7 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>',
   orcid: '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.6 6.6v4.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="5.6" cy="4.7" r=".85" fill="currentColor"/><path d="M8 6.6v4.6h1.3a2.3 2.3 0 0 0 0-4.6z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>',
   linkedin: '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="1.3" y="1.3" width="13.4" height="13.4" rx="2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5 7v4.6M5 4.8v.1M7.6 11.6V7m0 2.3c0-1.3.8-2.3 1.9-2.3s1.6.8 1.6 2v2.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  copy: '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="5.2" y="5.2" width="8.6" height="8.6" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M10.8 5.2V3.4a1.2 1.2 0 0 0-1.2-1.2H3.4a1.2 1.2 0 0 0-1.2 1.2v6.2a1.2 1.2 0 0 0 1.2 1.2h1.8" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>',
   github: '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>',
 };
 ---
@@ -109,6 +113,58 @@ const icons = {
               <h2>{s.title}</h2>
             </div>
             <div class="body"><s.Content /></div>
+            {s.details?.length > 0 && (
+              <dl class="minicv">
+                {s.details.map((g: { k: string; items: { t: string; d?: string; y?: string }[] }) => (
+                  <div class="cv-group">
+                    <dt>{g.k}</dt>
+                    <dd>
+                      <ul>
+                        {g.items.map((it) => (
+                          <li>
+                            <span class="cv-t">{it.t}</span>
+                            {it.y && <span class="cv-y">{it.y}</span>}
+                            {it.d && <span class="cv-d">{it.d}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            {s.id === 'contact' && (
+              <div class="contact">
+                {profile.email && (
+                  <div class="mailbox">
+                    <a class="mail-big" href={`mailto:${profile.email}`}>{profile.email}</a>
+                    <button type="button" class="btn copy" data-copy={profile.email} data-copied={t.copied}>
+                      <Fragment set:html={icons.copy} /><span data-copy-label>{t.copy}</span>
+                    </button>
+                  </div>
+                )}
+                <dl class="minicv">
+                  {s.open?.length > 0 && (
+                    <div class="cv-group">
+                      <dt>{t.openTo}</dt>
+                      <dd><ul>{s.open.map((o: string) => <li><span class="cv-t">{o}</span></li>)}</ul></dd>
+                    </div>
+                  )}
+                  {s.based && (
+                    <div class="cv-group">
+                      <dt>{t.basedIn}</dt>
+                      <dd><ul><li><span class="cv-t">{s.based}</span></li></ul></dd>
+                    </div>
+                  )}
+                </dl>
+                <div class="btns">
+                  {profile.email && <a class="btn primary" href={`mailto:${profile.email}`}><Fragment set:html={icons.mail} /><span>{t.email}</span></a>}
+                  {profile.orcid && <a class="btn" href={profile.orcid}><Fragment set:html={icons.orcid} /><span>ORCID</span></a>}
+                  {profile.linkedin && <a class="btn" href={profile.linkedin}><Fragment set:html={icons.linkedin} /><span>LinkedIn</span></a>}
+                  {profile.github && <a class="btn" href={profile.github}><Fragment set:html={icons.github} /><span>GitHub</span></a>}
+                </div>
+              </div>
+            )}
             {s.facts?.length > 0 && (
               <dl class="facts">
                 {s.facts.map((f: { k: string; v: string }) => (
@@ -149,7 +205,8 @@ const icons = {
         ))}
 
         <footer class="foot">
-          <span>© {new Date().getFullYear()} SIMONRODRIGUEZA.GITHUB.IO</span>
+          <span>© {built.getFullYear()} SIMONRODRIGUEZA.GITHUB.IO</span>
+          <span class="foot-upd">{t.lastUpdated.toUpperCase()}: {updated.toUpperCase()}</span>
           <span class="foot-links">
             {profile.orcid && <a href={profile.orcid}>ORCID</a>}
             {profile.github && <a href={profile.github}>GITHUB</a>}

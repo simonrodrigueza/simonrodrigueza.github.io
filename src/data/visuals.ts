@@ -1,7 +1,8 @@
 // ─────────────────────────────────────────────────────────────
 //  ETAPAS DE LA ANIMACIÓN (una por sección, en orden)
 //  Al bajar por la página, el detector pasa de una etapa a la siguiente:
-//  nube → disco → anillos → planetas → fotoevaporación → sistema despejado.
+//  nube → disco → anillos → planetas → fotoevaporación → sistema despejado
+//  → nos alejamos y aparece un campo de estrellas (contacto).
 //  "id" debe coincidir con el campo id de los archivos en src/content/.
 //  Normalmente no necesitas tocar esto, salvo los textos "plate".
 // ─────────────────────────────────────────────────────────────
@@ -48,5 +49,11 @@ export const visuals: Stage[] = [
     id: 'cv', roman: 'VI', cmap: 'gray', stops: ['#000000', '#3C3C3C', '#8A8A8A', '#D0D0D0', '#FFFFFF'], color: '#ECE8DF', zoom: 0.9, inc: 22,
     name: { en: 'a cleared system', es: 'un sistema despejado' },
     plate: { en: 'The gas is gone: a star and its planets remain.', es: 'El gas se fue: quedan la estrella y sus planetas.' },
+  },
+  {
+    // cubehelix (Green 2011): un mapa de color pensado para imágenes astronómicas
+    id: 'contact', roman: 'VII', cmap: 'cubehelix', stops: ['#000000', '#182E49', '#2B6F39', '#A07949', '#D490C6', '#C2D8F3', '#FFFFFF'], color: '#CF9CDA', zoom: 0.45, inc: 22,
+    name: { en: 'the next target', es: 'el próximo objetivo' },
+    plate: { en: 'Zooming out, the system is one point among many. Which one should we look at next?', es: 'Al alejarnos, el sistema es un punto entre muchos. ¿Cuál miramos después?' },
   },
 ];

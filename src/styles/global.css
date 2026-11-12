@@ -44,7 +44,7 @@ a:hover { color: #fff; }
 .toc[aria-current='true'] { color: var(--accent); border-bottom-color: var(--accent); }
 .roman { font-family: var(--mono); font-size: 10px; }
 .tools { order: 3; display: flex; align-items: center; gap: 20px; }
-.langbtn { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--mono); font-size: 11px; text-decoration: none; }
+.langbtn { display: inline-flex; align-items: center; white-space: nowrap; min-height: 44px; font-family: var(--mono); font-size: 11px; text-decoration: none; }
 
 /* Interruptor de la animación */
 .anim-switch {
@@ -153,6 +153,25 @@ html:not(.js) .anim-switch { display: none; }
 .fact dt { flex-shrink: 0; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--ink-3); text-transform: uppercase; }
 .leader { flex-grow: 1; min-width: 16px; border-bottom: 1px dotted var(--rule-2); transform: translateY(-4px); }
 .fact dd { margin: 0; min-width: 0; text-align: right; }
+/* Mini CV del About y bloque de contacto: etiqueta a la izquierda, contenido a la derecha */
+.minicv { margin: 0; display: flex; flex-direction: column; border-top: 1px solid var(--rule); }
+.cv-group { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--rule); }
+.cv-group dt { padding-top: 4px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); }
+.cv-group dd { margin: 0; min-width: 0; }
+.cv-group ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.cv-group li { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; font-size: 16px; line-height: 1.45; }
+.cv-t { color: var(--ink); }
+.cv-y { grid-column: 2; grid-row: 1; padding-top: 3px; font-family: var(--mono); font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.cv-d { grid-column: 1; font-size: 14px; color: var(--ink-3); }
+.contact { display: flex; flex-direction: column; gap: 24px; }
+.mailbox { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.mail-big {
+  font-family: var(--display); font-weight: 500; font-size: clamp(20px, 2.3vw, 30px); letter-spacing: -0.01em;
+  color: var(--c); text-decoration: none; overflow-wrap: anywhere; border-bottom: 1px solid transparent; transition: border-color 0.3s ease;
+}
+.mail-big:hover { border-color: var(--c); }
+button.btn { background: transparent; cursor: pointer; }
+.contact .btn.primary { background: var(--c); border-color: var(--c); }
 .cv-viewer { display: flex; flex-direction: column; gap: 12px; max-width: 560px; }
 .cv-frame { width: 100%; aspect-ratio: 8.5 / 11; background: #fff; }
 .cv-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
@@ -173,7 +192,24 @@ html:not(.js) .anim-switch { display: none; }
   padding: 24px 0 40px; border-top: 1px solid var(--rule);
   font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; color: var(--ink-3);
 }
+.foot-upd { flex-basis: 100%; order: 3; }
 .foot-links { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+
+/* Pantallas medianas: con siete secciones el menú necesita más espacio */
+@media (max-width: 1240px) and (min-width: 761px) {
+  .animword { display: none; }
+  .navwrap { gap: 4px 16px; }
+  .tools { gap: 14px; }
+}
+@media (max-width: 1120px) and (min-width: 761px) {
+  .mark { display: none; }
+  .top { padding: 0 24px; }
+  .navwrap { gap: 4px 13px; }
+  .toc { font-size: 14px; }
+}
+@media (max-width: 900px) and (min-width: 761px) {
+  .toc .roman { display: none; }
+}
 
 /* ── Celular ──────────────────────────────────────────────── */
 @media (max-width: 760px) {
@@ -197,6 +233,9 @@ html:not(.js) .anim-switch { display: none; }
   .sec { min-height: 560px; padding: 40px 0; justify-content: flex-start; scroll-margin-top: var(--band); }
   .anim-off .sec { min-height: 0; scroll-margin-top: 0; }
   .plate-fig { max-width: 260px; }
+  .cv-group { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 14px 0; }
+  .cv-group dt { padding-top: 0; }
+  .cv-group li { font-size: 15px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

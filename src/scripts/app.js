@@ -121,6 +121,22 @@ links.forEach((a) =>
   }),
 );
 
+// Botón para copiar el correo
+document.querySelectorAll('[data-copy]').forEach((b) =>
+  b.addEventListener('click', async () => {
+    const label = b.querySelector('[data-copy-label]');
+    const old = label ? label.textContent : '';
+    try {
+      await navigator.clipboard.writeText(b.dataset.copy);
+      if (label) label.textContent = b.dataset.copied;
+    } catch (err) {
+      window.location.href = `mailto:${b.dataset.copy}`;
+      return;
+    }
+    setTimeout(() => { if (label) label.textContent = old; }, 1800);
+  }),
+);
+
 setAnim(animOn(), false);
 const fromHash = location.hash.slice(1);
 if (fromHash && sections.some((s) => s.dataset.section === fromHash)) {
