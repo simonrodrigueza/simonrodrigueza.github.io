@@ -13,6 +13,10 @@ title: Publicaciones y charlas
 ### Charlas y pósteres
 
 - **Beyond LTE: Evaluation of HCN and C₂H₂ as truncation tracers in highly irradiated protoplanetary disks**\
+  **Rodríguez, S.**\
+  *Charla, reunión de la colaboración XUE, 2026.*
+
+- **Beyond LTE: Evaluation of HCN and C₂H₂ as truncation tracers in highly irradiated protoplanetary disks**\
   **Rodríguez, S.**, y Chaparro, G.\
   *Charla oral, IX Congreso Colombiano de Astronomía y Astrofísica (COCOA 2026), Bogotá, Colombia.*
 
