@@ -9,7 +9,7 @@ export const profile = {
   // Dos líneas del nombre tal como aparecen dentro del detector
   nameLines: ['Simón', 'Rodríguez Arango'],
   // Foto del encabezado: pon el archivo en public/images/ y escribe aquí su ruta, ej. '/images/foto.jpg'
-  photo: '',
+  photo: '/images/simon.webp',
   email: 'simon.rodrigueza@udea.edu.co',
   github: 'https://github.com/simonrodrigueza',
   orcid: 'https://orcid.org/0009-0005-7958-3759',
